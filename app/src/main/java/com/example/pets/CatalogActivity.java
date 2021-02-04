@@ -98,9 +98,6 @@ public class CatalogActivity extends AppCompatActivity {
      * the pets database.
      */
     private void displayDatabaseInfo() {
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
@@ -112,13 +109,11 @@ public class CatalogActivity extends AppCompatActivity {
         };
 
         // Perform a query on the pets table
-        Cursor cursor = db.query(
-                PetEntry.TABLE_NAME,           // The table to query
+        Cursor cursor = getContentResolver().query(
+                PetEntry.CONTENT_URI,           // The Content Uri: "com.example.pets/pets"
                 projection,                    // The array of columns to return (pass null to get all)
                 null,                // The columns for the WHERE clause
                 null,            // The values for the WHERE clause
-                null,                // don't group the rows
-                null,                  // don't filter by row groups
                 null                  // The sort order
         );
 

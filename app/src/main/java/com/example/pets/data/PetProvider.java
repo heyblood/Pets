@@ -6,13 +6,13 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.net.URI;
 
 public class PetProvider extends ContentProvider {
 
@@ -54,6 +54,9 @@ public class PetProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        Toast.makeText(getContext(),"PetProvider.query() called.",Toast.LENGTH_SHORT).show();
+        Log.i(LOG_TAG,"PetProvider.query() called.");
+
         // Get readable database
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
