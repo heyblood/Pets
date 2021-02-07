@@ -91,6 +91,8 @@ public class PetProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
+        Toast.makeText(getContext(), "PetProvider.insert() called.", Toast.LENGTH_SHORT).show();
+        Log.i(LOG_TAG, "PetProvider.insert() called.");
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case PETS:
