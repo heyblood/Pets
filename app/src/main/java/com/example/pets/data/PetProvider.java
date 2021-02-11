@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -56,7 +55,6 @@ public class PetProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        Toast.makeText(getContext(), "PetProvider.query() called.", Toast.LENGTH_SHORT).show();
         Log.i(LOG_TAG, "PetProvider.query() called.");
 
         // Get readable database
@@ -91,7 +89,6 @@ public class PetProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
-        Toast.makeText(getContext(), "PetProvider.insert() called.", Toast.LENGTH_SHORT).show();
         Log.i(LOG_TAG, "PetProvider.insert() called.");
         final int match = sUriMatcher.match(uri);
         switch (match) {
@@ -107,6 +104,25 @@ public class PetProvider extends ContentProvider {
      * for that specific row in the database.
      */
     private Uri insertPet(Uri uri, ContentValues values) {
+        // Check that the name is not null
+        String name = values.getAsString(PetContract.PetEntry.COLUMN_PET_NAME);
+        if (null == name) {
+            throw new IllegalArgumentException("Pet requires a name");
+        }
+
+        // Check that the gender is valid
+        Integer gender = values.getAsInteger(PetContract.PetEntry.COLUMN_PET_GENDER);
+        if (null == gender || !PetContract.PetEntry.isValidGender(gender)) {
+            throw new IllegalArgumentException("Pet requires valid gender");
+        }
+
+        // If the weight is provided, check that it's greater than or equal to 0 kg
+        Integer weight = values.getAsInteger(PetContract.PetEntry.COLUMN_PET_WEIGHT);
+        if (null != weight && 0 > weight) {
+            throw new IllegalArgumentException("Pet requires valid weight");
+        }
+
+        // No need to check the breed, any value is valid (including null).
 
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
@@ -114,7 +130,7 @@ public class PetProvider extends ContentProvider {
         // Insert the new pet with the given values
         long id = database.insert(PetContract.PetEntry.TABLE_NAME, null, values);
         // If the ID is -1, then the insertion failed. Log an error and return null.
-        if (id == -1) {
+        if (-1 == id) {
             Log.e(LOG_TAG, "Failed to insert row for " + uri);
             return null;
         }
