@@ -24,6 +24,7 @@ import android.provider.BaseColumns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +36,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
  * Displays list of pets that were entered and stored in the app.
  */
 public class CatalogActivity extends AppCompatActivity {
+
+    /**
+     * A list view to display all pets
+     */
+    ListView petListView;
+
+    /**
+     * Is used to manage each list item in the pet list
+     */
+    CursorAdapter cursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +62,17 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
+        // Find ListView to populate
+        petListView = findViewById(R.id.list);
+
+        // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
+        View emptyView = findViewById(R.id.empty_view);
+        petListView.setEmptyView(emptyView);
+
+        // Setup cursor adapter using cursor from last step
+        cursorAdapter = new PetCursorAdapter(getApplicationContext(), null);
+        // Attach cursor adapter to the ListView
+        petListView.setAdapter(cursorAdapter);
     }
 
     @Override
@@ -107,13 +129,9 @@ public class CatalogActivity extends AppCompatActivity {
                 null,            // The values for the WHERE clause
                 null                  // The sort order
         );
-        
-        // Find ListView to populate
-        ListView petListView = findViewById(R.id.list);
-        // Setup cursor adapter using cursor from last step
-        PetCursorAdapter adapter = new PetCursorAdapter(getApplicationContext(), cursor);
-        // Attach cursor adapter to the ListView
-        petListView.setAdapter(adapter);
+
+        // Switch to new cursor and update contents of ListView
+        cursorAdapter.changeCursor(cursor);
     }
 
     /**
