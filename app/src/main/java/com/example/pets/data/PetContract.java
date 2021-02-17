@@ -91,6 +91,14 @@ public final class PetContract {
          */
         public final static String COLUMN_PET_WEIGHT = "weight";
 
+
+        public final static String[] PROJECTION_ALL = {
+                _ID,
+                COLUMN_PET_NAME,
+                COLUMN_PET_BREED,
+                COLUMN_PET_GENDER,
+                COLUMN_PET_WEIGHT};
+
         /**
          * Possible values for the gender of the pet.
          */
