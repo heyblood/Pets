@@ -43,7 +43,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 /**
  * Displays list of pets that were entered and stored in the app.
  */
-public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CatalogActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    /**
+     * Tag for the log messages
+     */
+    public static final String LOG_TAG = CatalogActivity.class.getSimpleName();
 
     /**
      * Identifier for the pet data loader
@@ -53,14 +59,14 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     /**
      * A list view to display all pets
      */
-    ListView petListView;
+    ListView mPetListView;
 
     /**
      * Is used to manage each list item in the pet list
      */
-    CursorAdapter cursorAdapter;
+    CursorAdapter mCursorAdapter;
 
-    AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+    AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             // Create new intent to go to {@link EditorActivity}
@@ -97,19 +103,19 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         });
 
         // Find ListView to populate
-        petListView = findViewById(R.id.list);
+        mPetListView = findViewById(R.id.list);
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
         View emptyView = findViewById(R.id.empty_view);
-        petListView.setEmptyView(emptyView);
+        mPetListView.setEmptyView(emptyView);
 
         // Setup cursor adapter using cursor from last step
-        cursorAdapter = new PetCursorAdapter(getApplicationContext(), null);
+        mCursorAdapter = new PetCursorAdapter(getApplicationContext(), null);
         // Attach cursor adapter to the ListView
-        petListView.setAdapter(cursorAdapter);
+        mPetListView.setAdapter(mCursorAdapter);
 
         // Setup item click listener
-        petListView.setOnItemClickListener(onItemClickListener);
+        mPetListView.setOnItemClickListener(mOnItemClickListener);
 
         // Kick off the loader
         getSupportLoaderManager().initLoader(PET_LOADER, null, this);
@@ -144,7 +150,8 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
      * Helper method to delete all pets in the database.
      */
     private void deleteAllPets() {
-        int rowsDeleted = getContentResolver().delete(PetEntry.CONTENT_URI, null, null);
+        int rowsDeleted = getContentResolver().delete(PetEntry.CONTENT_URI,
+                null, null);
         Log.v("CatalogActivity", rowsDeleted + " rows deleted from pet database");
     }
 
@@ -165,6 +172,8 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         // into the pets database table.
         // Receive the new content URI that will allow us to access Toto's data in the future.
         Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+
+        Log.i(LOG_TAG, "Inserted a pet with uri " + newUri);
     }
 
     @NonNull
@@ -190,12 +199,12 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         // Update {@link PetCursorAdapter} with this new cursor containing updated pet data
-        cursorAdapter.swapCursor(data);
+        mCursorAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         // Callback called when the data needs to be deleted
-        cursorAdapter.swapCursor(null);
+        mCursorAdapter.swapCursor(null);
     }
 }
