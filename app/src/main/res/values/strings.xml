@@ -84,4 +84,8 @@
 
     <!-- Label for the pet's breed if the breed is unknown [CHAR LIMIT=20] -->
     <string name="unknown_breed">Unknown breed</string>
+
+    <string name="dismiss">Dismiss</string>
+    <string name="delete_all_pets_alert_msg">Delete all Pets? Can\'t undo.</string>
+    <string name="no_pet_existed">There is no any pets existed.</string>
 </resources>

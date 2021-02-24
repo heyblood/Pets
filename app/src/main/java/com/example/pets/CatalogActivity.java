@@ -15,11 +15,14 @@
  */
 package com.example.pets;
 
+import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.util.Log;
@@ -29,9 +32,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
@@ -129,6 +135,7 @@ public class CatalogActivity extends AppCompatActivity
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
@@ -149,10 +156,46 @@ public class CatalogActivity extends AppCompatActivity
     /**
      * Helper method to delete all pets in the database.
      */
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @SuppressLint("ResourceType")
     private void deleteAllPets() {
-        int rowsDeleted = getContentResolver().delete(PetEntry.CONTENT_URI,
-                null, null);
-        Log.v("CatalogActivity", rowsDeleted + " rows deleted from pet database");
+        // Check to see if there is a pet that can be deleted.
+        Cursor cursor = getContentResolver().query(PetEntry.CONTENT_URI, null, null, null);
+        int petsCount = cursor.getCount();
+        // If no pets, the delete operation cannot be performed.
+        if (petsCount <= 0) {
+            Toast.makeText(getBaseContext(), R.string.no_pet_existed, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // There are pets in database, can be deleted
+        // A alter dialog to ask people whether delete all pets
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setMessage(R.string.delete_all_pets_alert_msg);
+
+        // Cancel Button to dismiss delete all pets action
+        alertBuilder.setNegativeButton(R.string.dismiss, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // OK Button to delete all pets
+        alertBuilder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Use Custom {@link PetProvider} to delete data from database
+                int rowsDeleted = getContentResolver().delete(PetEntry.CONTENT_URI,
+                        null, null);
+                Log.v(LOG_TAG, rowsDeleted + " rows deleted from pet database");
+            }
+        });
+
+        // Create and show alert dialog
+        alertBuilder.show();
     }
 
     /**
