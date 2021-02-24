@@ -292,6 +292,7 @@ public class EditorActivity extends AppCompatActivity
             int rowsDeleted = getContentResolver().delete(mCurrentPetUri,
                     null, null);
 
+
             // Show a toast message depending on whether or not the delete was successful.
             if (rowsDeleted == 0) {
                 // If no rows were deleted, then there was an error with the delete.
